@@ -1,0 +1,107 @@
+spring:
+  profiles:
+    active: dev
+  application:
+    name: Job site harvestar (scraper)
+  jmx:
+    enabled: false
+
+  rabbitmq:
+    host: vntdaclswscrwb1
+    port: 5672
+    username: rabbit-client
+    password: client123
+
+# https://docs.spring.io/spring-boot/docs/current/reference/html/common-application-properties.html
+# TASK EXECUTION  (TaskExecutionProperties)
+  task:
+    execution:
+      pool:
+        core-size: 3
+        max-size: 3
+        queue-capacity: 25
+      thread-name-prefix: async-
+    scheduling:
+      pool:
+        size: 3
+      thread-name-prefix: scrapper-
+
+  datasource:
+    url: jdbc:jtds:sqlserver://vNTDACLSCRAPR01:1433/WSCRAPER
+    username: wscraper_dbo
+    password: wscraper_dbo123
+    driver-class-name: net.sourceforge.jtds.jdbc.Driver
+    hikari:
+      connection-test-query: SELECT 1
+  jpa:
+    show-sql: true
+    properties:
+      hibernate.dialect: org.hibernate.dialect.SQLServer2012Dialect
+      default_schema: dbo
+    
+management:
+  endpoints:
+    web:
+      exposure:
+        include: info, health, metrics, threaddump, heapdump, env
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  file: webscraper.log
+  level:
+    .: ERROR
+    org.springframework: ERROR
+    org.springframework.web: DEBUG
+    com.nazdaqTechnologies: WARN
+    com.nazdaqTechnologies.jdbc: ERROR
+    io.naztech.jobharvestar.crawler: WARN
+    io.naztech.jobharvestar.scraper: TRACE
+    com.gargoylesoftware.htmlunit: ERROR
+    com.gargoylesoftware.htmlunit.WebConsole: OFF
+    com.gargoylesoftware.htmlunit.javascript.StrictErrorReporter: OFF
+    com.gargoylesoftware.htmlunit.javascript.WebConsole: OFF
+    com.gargoylesoftware.htmlunit.javascript.DefaultJavaScriptErrorListener: OFF
+    com.gargoylesoftware.htmlunit.javascript.host.ActiveXObject: OFF
+    com.gargoylesoftware.htmlunit.javascript.host.html.HTMLDocument: OFF
+    com.gargoylesoftware.htmlunit.javascript.host.WindowProxy: OFF
+    com.gargoylesoftware.htmlunit.javascript.host.xml.XMLHttpRequest: OFF
+    com.gargoylesoftware.htmlunit.javascript.background.JavaScriptJobManagerImpl: OFF
+
+selenium:
+  webdriver:
+    chrome-driver: webdrivers/chromedriver.exe
+    firefox-driver: webdrivers/geckodriver.exe
+
+naztech:
+  webscrapper:
+    enable-tagging: false
+    job-list-buffer: 10
+    enabledScrappers: tdAmeritrade
+    disableScrappers: abnAmro,bankOfAmerica, bankOfIreland,bbvaColombia, bnpParibas, citiGroup, cmeGroup, hsbcOne, jpmorgan 
+---
+spring:
+  profiles: dev
+  datasource:
+    url: jdbc:jtds:sqlserver://vNTDACLSCRAPR01:1433/WSCRAPER
+    username: wscraper_dbo
+    password: wscraper_dbo123
+
+logging:
+  level:
+    .: ERROR
+    org.springframework: ERROR
+    org.apache.http : WARN
+    org.apache.http.wire : WARN
+---
+spring:
+  profiles: linux
+
+selenium:
+  webdriver:
+    chrome-driver: webdrivers/chromedriver
+    firefox-driver: webdrivers/geckodriver
+
+logging:
+  file: /tmp/webscraper.log
